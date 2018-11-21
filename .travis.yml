@@ -1,0 +1,21 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t aratik711/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run aratik711/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t aratik711/fibonacci-client ./client
+  - docker build -t aratik711/fibonacci-nginx ./nginx
+  - docker build -t aratik711/fibonacci-server ./server
+  - docker build -t aratik711/fibonacci-worker ./worker
+  - echo $DOCKER_PASSWORD | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push aratik711/fibonacci-client
+  - docker push aratik711/fibonacci-nginx
+  - docker push aratik711/fibonacci-server
+  - docker push aratik711/fibonacci-worker
+
